@@ -11,7 +11,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "username", "email", "password", "first_name", "last_name", "is_supplier"]
+        fields = ["id", "email", "password", "first_name", "last_name", "username", "position"]
         read_only_fields = ["id"]
 
     def create(self, validated_data: dict) -> User:
@@ -22,17 +22,17 @@ class CreateUserSerializer(serializers.ModelSerializer):
 
 
 class LoginUserSerializer(serializers.Serializer):
-    username = serializers.CharField(max_length=255)
+    email = serializers.CharField(max_length=255)
     password = serializers.CharField(max_length=255)
 
     def validate(self, data: dict) -> dict:
-        user = User.objects.filter(username=data['username']).first()
+        user = User.objects.filter(email=data['email']).first()
         if not user or not user.check_password(data['password']):
             raise serializers.ValidationError('Invalid credentials')
         return data
 
     def get_token(self, validated_data: dict) -> str:
-        user = User.objects.filter(username=validated_data['username']).first()
+        user = User.objects.filter(email=validated_data['email']).first()
         token = Token.objects.get_or_create(user=user)[0]
         return token.key
     

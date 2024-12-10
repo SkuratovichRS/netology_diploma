@@ -1,19 +1,5 @@
 from django.db import models
 
-# Order
-# user
-# dt
-# status
-# OrderItem
-# order
-# product
-# shop
-# quantity
-# Contact
-# type
-# user
-# value
-
 
 class Order(models.Model):
     dt = models.DateTimeField(auto_now_add=True)
@@ -42,6 +28,7 @@ class OrderItem(models.Model):
         verbose_name = "Детали заказа"
         verbose_name_plural = "Список деталей заказов"
         ordering = ("order",)
+
 
 class Contact(models.Model):
     type = models.CharField(max_length=150, null=False)

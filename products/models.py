@@ -3,7 +3,7 @@ from django.db import models
 
 class Shop(models.Model):
     name = models.CharField(max_length=150, null=False)
-    url = models.URLField(unique=True)
+    url = models.URLField(unique=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -57,15 +57,6 @@ class ProductInfo(models.Model):
         ordering = ("product",)
 
 
-# Parameter
-# name
-
-# ProductParameter
-# product_info
-# parameter
-# value
-
-
 class Parameter(models.Model):
     name = models.CharField(max_length=150, unique=True, null=False)
 
@@ -82,7 +73,6 @@ class ProductParameter(models.Model):
     value = models.CharField(max_length=150, null=False)
     parameter = models.ForeignKey(Parameter, on_delete=models.CASCADE, related_name="product_parameters")
     product_info = models.ForeignKey(ProductInfo, on_delete=models.CASCADE, related_name="product_parameters")
-    
 
     def __str__(self):
         return f"{self.product_info} {self.parameter}"

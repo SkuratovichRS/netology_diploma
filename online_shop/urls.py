@@ -18,6 +18,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from products.views import ImportView
 from users.views import (CreateUserView, LoginUserView, RecoverPasswordView,
                          RecoveryCodeView)
 
@@ -27,4 +28,6 @@ urlpatterns = [
     path("api/v1/login", LoginUserView.as_view(), name="login_user"),
     path("api/v1/users/recovery-code", RecoveryCodeView.as_view(), name="recovery_code"),
     path("api/v1/users/recover-password", RecoverPasswordView.as_view(), name="recover_password"),
+
+    path("api/v1/products/import", ImportView.as_view(), name="products"),
 ]

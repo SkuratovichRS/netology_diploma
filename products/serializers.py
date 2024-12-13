@@ -1,4 +1,5 @@
-from products.models import Category, Parameter, Product, ProductInfo, ProductParameter, Shop
+from products.models import (Category, Parameter, Product, ProductInfo,
+                             ProductParameter, Shop)
 
 
 class ImportSerializer:

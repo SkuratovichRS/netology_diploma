@@ -1,3 +1,5 @@
+from rest_framework import serializers
+
 from products.models import (Category, Parameter, Product, ProductInfo,
                              ProductParameter, Shop)
 
@@ -27,3 +29,29 @@ class ImportSerializer:
         self, value: str, parameter: Parameter, product_info: ProductInfo
     ) -> ProductParameter:
         return ProductParameter.objects.create(value=value, parameter=parameter, product_info=product_info)
+
+
+class ProductParameterSerializer(serializers.ModelSerializer):
+    parameter = serializers.ReadOnlyField(source="parameter.name")
+    
+    class Meta:
+        model = ProductParameter
+        fields = ("parameter", "value")
+
+
+class ProductInfoSerializer(serializers.ModelSerializer):
+    shop = serializers.ReadOnlyField(source="shop.name")
+    product_parameters = ProductParameterSerializer(many=True)
+
+    class Meta:
+        model = ProductInfo
+        fields = ("name", "quantity", "price", "price_rrc", "shop", "product_parameters")
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    category = serializers.ReadOnlyField(source="category.name")
+    infos = ProductInfoSerializer(many=True)
+
+    class Meta:
+        model = Product
+        fields = ("id", "name", "category", "infos")

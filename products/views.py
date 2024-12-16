@@ -5,8 +5,9 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from products.models import Product
 from products.permissions import IsShopPermission
-from products.serializers import ImportSerializer
+from products.serializers import ImportSerializer, ProductSerializer
 
 
 class ImportView(APIView):
@@ -46,3 +47,20 @@ class ImportView(APIView):
             return Response(data={"error": "Invalid file format"}, status=400)
 
         return Response(data={"message": "File imported successfully"}, status=201)
+    
+
+class ListProductsView(APIView):
+    def get(self, request: Request) -> Response:
+        queryset = Product.objects.prefetch_related("infos", "infos__product_parameters").all()
+        serializer = ProductSerializer(queryset, many=True)
+        return Response(serializer.data)
+        
+class ProductView(APIView):
+    def get(self, request: Request, pk: int) -> Response:
+        try:
+            product = Product.objects.prefetch_related("infos", "infos__product_parameters").get(id=pk)
+        except Product.DoesNotExist:
+            return Response(data={"error": "Product not found"}, status=404)
+        
+        serializer = ProductSerializer(product)
+        return Response(serializer.data)

@@ -1,9 +1,17 @@
 from django.db import models
+from django.forms import ValidationError
+
+
+def validate_status(value: str) -> str:
+    if value not in ["created", "confirmed", "cancelled"]:
+        raise ValidationError("Invalid status")
+    return value
 
 
 class Order(models.Model):
     dt = models.DateTimeField(auto_now_add=True)
-    status = models.BooleanField(default=False)
+    status = models.CharField(max_length=150, null=False, default="created", validators=[validate_status])
+    address = models.CharField(max_length=150, null=True, blank=True)
     user = models.ForeignKey("users.User", on_delete=models.CASCADE, related_name="orders")
 
     def __str__(self):

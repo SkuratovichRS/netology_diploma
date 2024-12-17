@@ -12,15 +12,21 @@ from products.serializers import ImportSerializer, ProductSerializer
 
 class ImportView(APIView):
 
-    def get_permissions(self):
+    def get_permissions(self) -> list:
         return [IsAuthenticated(), IsShopPermission()]
 
     def post(self, request: Request) -> Response:
-        file = request.FILES.get("file").read().decode("utf-8")
+        file = request.FILES.get("file")
         if not file:
             return Response(data={"error": "No file provided"}, status=400)
+        file = file.read().decode("utf-8")
+
+        try:
+            data = yaml.safe_load(file)
+        except yaml.YAMLError:
+            return Response(data={"error": "Invalid file format"}, status=400)
+
         serializer = ImportSerializer()
-        data = yaml.safe_load(file)
 
         try:
             shop_object = serializer.create_shop(data["shop"])
@@ -43,24 +49,25 @@ class ImportView(APIView):
                 except IntegrityError:
                     continue
 
-        except KeyError:
+        except (KeyError, TypeError):
             return Response(data={"error": "Invalid file format"}, status=400)
 
         return Response(data={"message": "File imported successfully"}, status=201)
-    
+
 
 class ListProductsView(APIView):
     def get(self, request: Request) -> Response:
         queryset = Product.objects.prefetch_related("infos", "infos__product_parameters").all()
         serializer = ProductSerializer(queryset, many=True)
         return Response(serializer.data)
-        
+
+
 class ProductView(APIView):
     def get(self, request: Request, pk: int) -> Response:
         try:
             product = Product.objects.prefetch_related("infos", "infos__product_parameters").get(id=pk)
         except Product.DoesNotExist:
             return Response(data={"error": "Product not found"}, status=404)
-        
+
         serializer = ProductSerializer(product)
         return Response(serializer.data)

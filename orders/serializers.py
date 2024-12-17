@@ -14,7 +14,7 @@ class OrderSerializer(serializers.ModelSerializer):
             "dt": {"read_only": True},
         }
 
-    def update(self, instance, validated_data):
+    def update(self, instance: Order, validated_data: dict) -> Order:
         if validated_data.get("status") == "confirmed" and validated_data.get("address") is not None:
             send_mail(
                 "Подтверждение заказа",
